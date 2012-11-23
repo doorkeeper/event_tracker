@@ -21,8 +21,9 @@ module EventTracker
         registered_properties = session.delete(:registered_properties)
         event_tracker_queue = session.delete(:event_tracker_queue)
         distinct_id = respond_to?(:mixpanel_distinct_id) && mixpanel_distinct_id
+        name_tag = respond_to?(:mixpanel_name_tag) && mixpanel_name_tag
 
-        body.insert insert_at, EventTracker::Mixpanel.tags(mixpanel_key, distinct_id, registered_properties, event_tracker_queue)
+        body.insert insert_at, EventTracker::Mixpanel.tags(mixpanel_key, distinct_id, name_tag, registered_properties, event_tracker_queue)
         response.body = body
       end
     end

@@ -1,5 +1,5 @@
 module EventTracker::Mixpanel
-  def self.tags(mixpanel_key, distinct_id, registered_properties, event_tracker_queue)
+  def self.tags(mixpanel_key, distinct_id, name_tag, registered_properties, event_tracker_queue)
     s = %q{<script type="text/javascript">}
     s << <<-EOD
       (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
@@ -21,7 +21,8 @@ module EventTracker::Mixpanel
         s << %Q{mixpanel.track("#{event_name}"#{p});}
       end
     end
-    s << %Q{mixpanel.identify(#{distinct_id.to_json})} if distinct_id
+    s << %Q{mixpanel.identify("#{distinct_id}");} if distinct_id
+    s << %Q{mixpanel.name_tag("#{name_tag}");} if name_tag
     s << %Q{</script>}
   end
 end

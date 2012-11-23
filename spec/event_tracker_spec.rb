@@ -107,4 +107,20 @@ feature 'basic integration' do
     background { visit "/identity" }
     it_should_behave_like "with distinct id"
   end
+
+  class NameTagController < ApplicationController
+    after_filter :append_event_tracking_tags
+    def mixpanel_name_tag
+      "foo@example.org"
+    end
+
+    def index
+      render inline: "OK", layout: true
+    end
+  end
+
+  context "with name tag" do
+    background { visit "/name_tag" }
+    it { should include(%q{mixpanel.name_tag("foo@example.org")}) }
+  end
 end
