@@ -23,7 +23,14 @@ module EventTracker
         distinct_id = respond_to?(:mixpanel_distinct_id) && mixpanel_distinct_id
         name_tag = respond_to?(:mixpanel_name_tag) && mixpanel_name_tag
 
-        body.insert insert_at, EventTracker::Mixpanel.tags(mixpanel_key, distinct_id, name_tag, registered_properties, event_tracker_queue)
+        a = [ %q{<script type="text/javascript">} ]
+        a << EventTracker::Mixpanel.init(mixpanel_key)
+        a << EventTracker::Mixpanel.identify(distinct_id) if distinct_id
+        a << EventTracker::Mixpanel.name_tag(name_tag) if name_tag
+        a << EventTracker::Mixpanel.register(registered_properties) if registered_properties.present?
+        a << EventTracker::Mixpanel.track(event_tracker_queue) if event_tracker_queue.present?
+        a << %q{</script>}
+        body.insert insert_at, a.join("\n")
         response.body = body
       end
     end

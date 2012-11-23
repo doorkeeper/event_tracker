@@ -1,7 +1,6 @@
 module EventTracker::Mixpanel
-  def self.tags(mixpanel_key, distinct_id, name_tag, registered_properties, event_tracker_queue)
-    s = %q{<script type="text/javascript">}
-    s << <<-EOD
+  def self.init(mixpanel_key)
+    s = <<-EOD
       (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
       b.type="text/javascript";b.async=!0;b.src=("https:"===c.location.protocol?"https:":"http:")+
       '//cdn.mxpnl.com/libs/mixpanel-2.1.min.js';d=c.getElementsByTagName("script")[0];
@@ -14,15 +13,24 @@ module EventTracker::Mixpanel
       a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
       mixpanel.init("#{mixpanel_key}");
     EOD
-    s << %Q{mixpanel.register(#{registered_properties.to_json})\n} unless registered_properties.blank?
-    if event_tracker_queue
-      event_tracker_queue.each do |event_name, properties| 
-        p = properties.empty? ? "" : ", #{properties.to_json}"
-        s << %Q{mixpanel.track("#{event_name}"#{p});}
-      end
-    end
-    s << %Q{mixpanel.identify("#{distinct_id}");} if distinct_id
-    s << %Q{mixpanel.name_tag("#{name_tag}");} if name_tag
-    s << %Q{</script>}
+  end
+
+  def self.register(registered_properties)
+    %Q{mixpanel.register(#{registered_properties.to_json})}
+  end
+
+  def self.track(event_tracker_queue)
+    event_tracker_queue.map do |event_name, properties| 
+      p = properties.empty? ? "" : ", #{properties.to_json}"
+      %Q{mixpanel.track("#{event_name}"#{p});}
+    end.join("\n")
+  end
+
+  def self.name_tag(name_tag)
+    %Q{mixpanel.name_tag("#{name_tag}");}
+  end
+
+  def self.identify(distinct_id)
+    %Q{mixpanel.identify("#{distinct_id}");}
   end
 end
