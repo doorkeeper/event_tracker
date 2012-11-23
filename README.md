@@ -1,6 +1,6 @@
 # EventTracker
 
-TODO: Write a gem description
+Easy tracking using mixpanel or kissmetrics
 
 ## Installation
 
@@ -16,9 +16,10 @@ Or install it yourself as:
 
     $ gem install event_tracker
 
-## Usage
+## Todos
 
-TODO: Write usage instructions here
+* AJAX handling
+* External redirects
 
 ## Contributing
 
