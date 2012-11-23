@@ -10,15 +10,17 @@ module EventTracker
       end
     end
 
-    def track_event(s)
-      event_tracker_queue << s
+    def track_event(event_name, args = {})
+      event_tracker_queue << [event_name, args]
     end
 
     def append_event_tracking_tags
       body = response.body
       insert_at = body.index('</head')
-      body.insert insert_at, event_tracking_tag
-      response.body = body
+      if insert_at
+        body.insert insert_at, event_tracking_tag
+        response.body = body
+      end
     end
 
     def event_tracker_queue
@@ -40,8 +42,13 @@ module EventTracker
         a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
         mixpanel.init("YOUR_TOKEN");
       EOD
-      s << event_tracker_queue.map {|s| %Q{mixpanel.track("#{s}");} }.join("\n")
+      s << event_tracker_queue.map {|event_name, properties| event_call(event_name, properties) }.join("\n")
       s << %Q{</script>}
+    end
+
+    def event_call(event_name, properties)
+      s = properties.empty? ? "" : ", #{properties.to_json}"
+      %Q{mixpanel.track("#{event_name}"#{s});}
     end
   end
 
