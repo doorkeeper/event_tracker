@@ -53,6 +53,11 @@ feature 'basic integration' do
     it_should_behave_like "with event"
   end
 
+  context 'visit page with tracking' do
+    background { visit '/basic/in_views' }
+    it_should_behave_like "with event"
+  end
+
   context 'visit page with tracking then without tracking' do
     background do
       visit '/basic/with_tracking'

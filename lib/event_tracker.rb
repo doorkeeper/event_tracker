@@ -3,7 +3,7 @@ require "event_tracker/mixpanel"
 require "event_tracker/kissmetrics"
 
 module EventTracker
-  module ActionControllerExtension
+  module HelperMethods
     def track_event(event_name, args = {})
       (session[:event_tracker_queue] ||= []) << [event_name, args]
     end
@@ -11,7 +11,9 @@ module EventTracker
     def register_properties(args)
       (session[:registered_properties] ||= {}).merge!(args)
     end
+  end
 
+  module ActionControllerExtension
     def append_event_tracking_tags
       mixpanel_key = Rails.application.config.event_tracker.mixpanel_key
       kissmetrics_key = Rails.application.config.event_tracker.kissmetrics_key
@@ -64,6 +66,8 @@ module EventTracker
     initializer "event_tracker" do |app|
       ActiveSupport.on_load :action_controller do
         include ActionControllerExtension
+        include HelperMethods
+        helper HelperMethods
       end
     end
   end
