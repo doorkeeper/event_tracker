@@ -1,5 +1,6 @@
 $:.unshift File.expand_path('../../lib', __FILE__)
 
+require "bundler"
 require "rails"
 Rails.env = "test"
 Bundler.require(:default, Rails.env)
