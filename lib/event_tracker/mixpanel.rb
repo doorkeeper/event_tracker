@@ -16,14 +16,12 @@ module EventTracker::Mixpanel
   end
 
   def self.register(registered_properties)
-    %Q{mixpanel.register(#{registered_properties.to_json})}
+    %Q{mixpanel.register(#{registered_properties.to_json});}
   end
 
-  def self.track(event_tracker_queue)
-    event_tracker_queue.map do |event_name, properties| 
-      p = properties.empty? ? "" : ", #{properties.to_json}"
-      %Q{mixpanel.track("#{event_name}"#{p});}
-    end.join("\n")
+  def self.track(event_name, properties)
+    p = properties.empty? ? "" : ", #{properties.to_json}"
+    %Q{mixpanel.track("#{event_name}"#{p});}
   end
 
   def self.name_tag(name_tag)

@@ -14,6 +14,7 @@ app.config.active_support.deprecation = :log
 app.config.action_dispatch.show_exceptions = false
 
 app.config.event_tracker.mixpanel_key = "YOUR_TOKEN"
+app.config.event_tracker.kissmetrics_key = "KISSMETRICS_KEY"
 
 app.initialize!
 
