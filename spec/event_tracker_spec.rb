@@ -66,6 +66,8 @@ feature 'basic integration' do
     tracks_event
 
     def index
+      register_property "age", 19
+      register_property "gender", "female"
       track_event "Take an action", property1: "a", property2: 1
       render inline: "OK", layout: true
     end
@@ -74,5 +76,6 @@ feature 'basic integration' do
   context "track event with properties" do
     background { visit "/with_properties" }
     it { should include %Q{mixpanel.track("Take an action", {"property1":"a","property2":1})} }
+    it { should include %Q{mixpanel.register({"age":19,"gender":"female"})} }
   end
 end
