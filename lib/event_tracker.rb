@@ -3,13 +3,6 @@ require "active_support/concern"
 
 module EventTracker
   module ActionControllerExtension
-    extend ActiveSupport::Concern
-    module ClassMethods
-      def tracks_event
-        after_filter :append_event_tracking_tags
-      end
-    end
-
     def track_event(event_name, args = {})
       (session[:event_tracker_queue] ||= []) << [event_name, args]
     end
@@ -30,6 +23,7 @@ module EventTracker
     def event_tracking_tag
       registered_properties = session.delete(:registered_properties)
       event_tracker_queue = session.delete(:event_tracker_queue)
+      identity = respond_to?(:event_tracker_identity) && event_tracker_identity 
 
       s = %q{<script type="text/javascript">}
       s << <<-EOD
@@ -47,6 +41,7 @@ module EventTracker
       EOD
       s << %Q{mixpanel.register(#{registered_properties.to_json})\n} unless registered_properties.blank?
       s << event_tracker_queue.map {|event_name, properties| event_call(event_name, properties) }.join("\n") if event_tracker_queue
+      s << %Q{mixpanel.identify(#{identity.to_json})} if identity
       s << %Q{</script>}
     end
 

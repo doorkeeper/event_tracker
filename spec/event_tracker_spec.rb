@@ -5,7 +5,7 @@ shared_examples_for "mixpanel init" do
 end
 
 shared_examples_for "without distinct id" do
-  it { should_not include('distinct_id') }
+  it { should_not include('mixpanel.identify("distinct_id")') }
 end
 
 shared_examples_for "with distinct id" do
@@ -24,7 +24,7 @@ feature 'basic integration' do
   subject { page.find("script").native.content }
 
   class BasicController < ApplicationController
-    tracks_event
+    after_filter :append_event_tracking_tags
     def no_tracking
       render inline: "OK", layout: true
     end
@@ -54,13 +54,11 @@ feature 'basic integration' do
       visit '/basic/with_tracking'
       visit '/basic/no_tracking'
     end
-    it_should_behave_like "mixpanel init"
-    it_should_behave_like "without distinct id"
     it_should_behave_like "without event"
   end
 
   class RedirectsController < ApplicationController
-    tracks_event
+    after_filter :append_event_tracking_tags
 
     def index
       track_event "Register for site"
@@ -78,7 +76,7 @@ feature 'basic integration' do
   end
 
   class WithPropertiesController < ApplicationController
-    tracks_event
+    after_filter :append_event_tracking_tags
 
     def index
       register_property "age", 19
@@ -92,5 +90,21 @@ feature 'basic integration' do
     background { visit "/with_properties" }
     it { should include %Q{mixpanel.track("Take an action", {"property1":"a","property2":1})} }
     it { should include %Q{mixpanel.register({"age":19,"gender":"female"})} }
+  end
+
+  class IdentityController < ApplicationController
+    after_filter :append_event_tracking_tags
+    def event_tracker_identity
+      "distinct_id"
+    end
+
+    def index
+      render inline: "OK", layout: true
+    end
+  end
+
+  context "with identity" do
+    background { visit "/identity" }
+    it_should_behave_like "with distinct id"
   end
 end
