@@ -11,11 +11,11 @@ module EventTracker
     end
 
     def track_event(event_name, args = {})
-      event_tracker_queue << [event_name, args]
+      (session[:event_tracker_queue] ||= []) << [event_name, args]
     end
 
     def register_property(name, value)
-      registered_properties[name] = value
+      (session[:registered_properties] ||= {})[name] = value
     end
 
     def append_event_tracking_tags
@@ -27,15 +27,10 @@ module EventTracker
       end
     end
 
-    def event_tracker_queue
-      session[:event_tracker_queue] ||= []
-    end
-
-    def registered_properties
-      session[:registered_properties] ||= {}
-    end
-
     def event_tracking_tag
+      registered_properties = session.delete(:registered_properties)
+      event_tracker_queue = session.delete(:event_tracker_queue)
+
       s = %q{<script type="text/javascript">}
       s << <<-EOD
         (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
@@ -50,8 +45,8 @@ module EventTracker
         a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
         mixpanel.init("YOUR_TOKEN");
       EOD
-      s << %Q{mixpanel.register(#{registered_properties.to_json})\n} unless registered_properties.empty?
-      s << event_tracker_queue.map {|event_name, properties| event_call(event_name, properties) }.join("\n")
+      s << %Q{mixpanel.register(#{registered_properties.to_json})\n} unless registered_properties.blank?
+      s << event_tracker_queue.map {|event_name, properties| event_call(event_name, properties) }.join("\n") if event_tracker_queue
       s << %Q{</script>}
     end
 

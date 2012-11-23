@@ -12,6 +12,10 @@ shared_examples_for "with distinct id" do
   it { should include('mixpanel.identify("distinct_id")') }
 end
 
+shared_examples_for "without event" do
+  it { should_not include('mixpanel.track("Register for site")') }
+end
+
 shared_examples_for "with event" do
   it { should include('mixpanel.track("Register for site")') }
 end
@@ -35,6 +39,7 @@ feature 'basic integration' do
     background { visit '/basic/no_tracking' }
     it_should_behave_like "mixpanel init"
     it_should_behave_like "without distinct id"
+    it_should_behave_like "without event"
   end
 
   context 'visit page with tracking' do
@@ -42,6 +47,16 @@ feature 'basic integration' do
     it_should_behave_like "mixpanel init"
     it_should_behave_like "without distinct id"
     it_should_behave_like "with event"
+  end
+
+  context 'visit page with tracking then without tracking' do
+    background do
+      visit '/basic/with_tracking'
+      visit '/basic/no_tracking'
+    end
+    it_should_behave_like "mixpanel init"
+    it_should_behave_like "without distinct id"
+    it_should_behave_like "without event"
   end
 
   class RedirectsController < ApplicationController
