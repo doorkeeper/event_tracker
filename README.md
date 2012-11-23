@@ -1,4 +1,4 @@
-# EventTracker
+# Event Tracker
 
 Easy tracking using mixpanel or kissmetrics
 
@@ -15,6 +15,35 @@ And then execute:
 Or install it yourself as:
 
     $ gem install event_tracker
+
+## Usage
+
+```ruby
+# config/application.rb
+config.event_tracker.mixpanel_key = "YOUR_KEY"
+config.event_tracker.kissmetrics_key = "YOUR_KEY"
+
+class ApplicationController < ActionController::Base
+  after_filter :append_event_tracking_tags
+
+  # optionally identify users
+  def mixpanel_distinct_id
+    current_visitor_id
+  end
+
+  def mixpanel_name_tag
+    current_user && current_user.email
+  end
+
+  def kissmetrics_identity
+    current_user && current_user.email
+  end
+end
+
+# in controller or views
+track_event("Event Name", optional_property: "value")
+register_properties(name: "value")
+```
 
 ## Todos
 
