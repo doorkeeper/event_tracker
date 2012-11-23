@@ -79,8 +79,8 @@ feature 'basic integration' do
     after_filter :append_event_tracking_tags
 
     def index
-      register_property "age", 19
-      register_property "gender", "female"
+      register_properties age: 19
+      register_properties gender: "female"
       track_event "Take an action", property1: "a", property2: 1
       render inline: "OK", layout: true
     end
@@ -94,7 +94,7 @@ feature 'basic integration' do
 
   class IdentityController < ApplicationController
     after_filter :append_event_tracking_tags
-    def event_tracker_identity
+    def mixpanel_distinct_id
       "distinct_id"
     end
 

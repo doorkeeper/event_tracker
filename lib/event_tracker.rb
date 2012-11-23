@@ -7,8 +7,8 @@ module EventTracker
       (session[:event_tracker_queue] ||= []) << [event_name, args]
     end
 
-    def register_property(name, value)
-      (session[:registered_properties] ||= {})[name] = value
+    def register_properties(args)
+      (session[:registered_properties] ||= {}).merge!(args)
     end
 
     def append_event_tracking_tags
@@ -20,9 +20,9 @@ module EventTracker
       if insert_at
         registered_properties = session.delete(:registered_properties)
         event_tracker_queue = session.delete(:event_tracker_queue)
-        identity = respond_to?(:event_tracker_identity) && event_tracker_identity
+        distinct_id = respond_to?(:mixpanel_distinct_id) && mixpanel_distinct_id
 
-        body.insert insert_at, EventTracker::Mixpanel.tags(mixpanel_key, identity, registered_properties, event_tracker_queue)
+        body.insert insert_at, EventTracker::Mixpanel.tags(mixpanel_key, distinct_id, registered_properties, event_tracker_queue)
         response.body = body
       end
     end
