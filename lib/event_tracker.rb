@@ -43,7 +43,7 @@ module EventTracker
         'track_forms','register','register_once','unregister','identify','name_tag',
         'set_config','people.identify','people.set','people.increment'];for(e=0;e<h.length;e++)d(g,h[e]);
         a._i.push([b,c,f])};a.__SV=1.1;})(document,window.mixpanel||[]);
-        mixpanel.init("YOUR_TOKEN");
+        mixpanel.init("#{Rails.application.config.event_tracker.mixpanel_key}");
       EOD
       s << %Q{mixpanel.register(#{registered_properties.to_json})\n} unless registered_properties.blank?
       s << event_tracker_queue.map {|event_name, properties| event_call(event_name, properties) }.join("\n") if event_tracker_queue
@@ -57,6 +57,7 @@ module EventTracker
   end
 
   class Railtie < Rails::Railtie
+    config.event_tracker = ActiveSupport::OrderedOptions.new
     initializer "event_tracker" do |app|
       ActiveSupport.on_load :action_controller do
         include ActionControllerExtension
