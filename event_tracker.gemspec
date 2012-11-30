@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["paul@mobalean.com"]
   gem.description   = %q{Easy integration with Mixpanel and Kissmetrics for Rails}
   gem.summary       = %q{Track using javascript from your controllers, even when redirecting}
-  gem.homepage      = ""
+  gem.homepage      = "http://www.doorkeeperhq.com/developer/event-tracker-mixpanel-kissmetrics"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
