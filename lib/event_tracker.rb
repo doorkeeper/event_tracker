@@ -24,6 +24,7 @@ module EventTracker
       if insert_at
         trackers = []
         a = [ %q{<script type="text/javascript">} ]
+        a << %q{//<![CDATA[}
 
         if mixpanel_key
           trackers << EventTracker::Mixpanel
@@ -53,7 +54,9 @@ module EventTracker
             end
           end
         end
+        a << %q{//]]>}
         a << %q{</script>}
+
         body.insert insert_at, a.join("\n")
         response.body = body
       end
