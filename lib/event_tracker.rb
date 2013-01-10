@@ -23,8 +23,8 @@ module EventTracker
       insert_at = body.index('</head')
       if insert_at
         trackers = []
-        a = [ %q{<script type="text/javascript">} ]
 
+        a = []
         if mixpanel_key
           trackers << EventTracker::Mixpanel
           distinct_id = respond_to?(:mixpanel_distinct_id) && mixpanel_distinct_id
@@ -44,17 +44,16 @@ module EventTracker
         registered_properties = session.delete(:registered_properties)
         event_tracker_queue = session.delete(:event_tracker_queue)
 
-        trackers.each do |tracker| 
+        trackers.each do |tracker|
           a << tracker.register(registered_properties) if registered_properties.present?
 
           if event_tracker_queue.present?
-            event_tracker_queue.each do |event_name, properties| 
+            event_tracker_queue.each do |event_name, properties|
               a << tracker.track(event_name, properties)
             end
           end
         end
-        a << %q{</script>}
-        body.insert insert_at, a.join("\n")
+        body.insert insert_at, view_context.javascript_tag(a.join("\n"))
         response.body = body
       end
     end
