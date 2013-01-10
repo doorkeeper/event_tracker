@@ -1,6 +1,7 @@
 require "spec_helper"
 
 shared_examples_for "init" do
+  subject { page.find("head script").native.content }
   it { should include('mixpanel.init("YOUR_TOKEN")') }
   it { should include(%q{var _kmk = _kmk || 'KISSMETRICS_KEY'}) }
 end
@@ -25,7 +26,7 @@ shared_examples_for "with event" do
 end
 
 feature 'basic integration' do
-  subject { page.find("script").native.content }
+  subject { page.find("body script").native.content }
 
   class BasicController < ApplicationController
     after_filter :append_event_tracking_tags
