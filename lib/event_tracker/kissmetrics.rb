@@ -1,8 +1,12 @@
-module EventTracker::Kissmetrics
-  def self.init(key)
+class EventTracker::Kissmetrics
+  def initialize(key)
+    @key = key
+  end
+
+  def init
     <<-EOD
       var _kmq = _kmq || [];
-      var _kmk = _kmk || '#{key}';
+      var _kmk = _kmk || '#{@key}';
       function _kms(u){
         setTimeout(function(){
           var d = document, f = d.getElementsByTagName('script')[0],
@@ -16,16 +20,16 @@ module EventTracker::Kissmetrics
     EOD
   end
 
-  def self.register(registered_properties)
+  def register(registered_properties)
     %Q{_kmq.push(['set', #{registered_properties.to_json}]);}
   end
 
-  def self.track(event_name, properties)
+  def track(event_name, properties)
     p = properties.empty? ? "" : ", #{properties.to_json}"
     %Q{_kmq.push(['record', '#{event_name}'#{p}]);}
   end
 
-  def self.identify(identity)
+  def identify(identity)
     %Q{_kmq.push(['identify', '#{identity}']);}
   end
 end
