@@ -47,13 +47,13 @@ module EventTracker
       body_insert_at = body.index('</body')
       return unless body_insert_at
       a = []
-      if distinct_id = respond_to?(:mixpanel_distinct_id) && mixpanel_distinct_id
+      if distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
         a << mixpanel_tracker.identify(distinct_id)
       end
-      if name_tag = respond_to?(:mixpanel_name_tag) && mixpanel_name_tag
+      if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag
         a << mixpanel_tracker.name_tag(name_tag)
       end
-      if identity = respond_to?(:kissmetrics_identity) && kissmetrics_identity
+      if identity = respond_to?(:kissmetrics_identity, true) && kissmetrics_identity
         a << kissmetrics_tracker.identify(identity)
       end
       registered_properties = session.delete(:registered_properties)

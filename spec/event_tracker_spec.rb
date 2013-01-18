@@ -139,4 +139,17 @@ feature 'basic integration' do
     background { visit "/name_tag" }
     it { should include(%q{mixpanel.name_tag("foo@example.org")}) }
   end
+
+  class PrivateController < ApplicationController
+    after_filter :append_event_tracking_tags
+    def index; render inline: "OK", layout: true; end
+    private
+    def mixpanel_distinct_id; "distinct_id"; end
+    def kissmetrics_identity; "name@email.com"; end
+  end
+
+  context "with private methods" do
+    background { visit "/private" }
+    it_should_behave_like "with distinct id"
+  end
 end
