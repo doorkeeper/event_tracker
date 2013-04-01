@@ -19,7 +19,7 @@ app.config.event_tracker.kissmetrics_key = "KISSMETRICS_KEY"
 app.initialize!
 
 app.routes.draw do
-  match ':controller(/:action(/:id))'
+  get ':controller(/:action(/:id))'
 end
 
 class ApplicationController < ActionController::Base; end
