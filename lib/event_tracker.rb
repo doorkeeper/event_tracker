@@ -11,6 +11,10 @@ module EventTracker
     def register_properties(args)
       (session[:registered_properties] ||= {}).merge!(args)
     end
+
+    def mixpanel_people_set(args)
+      (session[:mixpanel_people_set] ||= {}).merge!(args)
+    end
   end
 
   module ActionControllerExtension
@@ -52,6 +56,9 @@ module EventTracker
       end
       if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag
         a << mixpanel_tracker.name_tag(name_tag)
+      end
+      if (people = session.delete(:mixpanel_people_set)).present?
+        a << mixpanel_tracker.people_set(people)
       end
       if identity = respond_to?(:kissmetrics_identity, true) && kissmetrics_identity
         a << kissmetrics_tracker.identify(identity)

@@ -152,4 +152,18 @@ feature 'basic integration' do
     background { visit "/private" }
     it_should_behave_like "with distinct id"
   end
+
+  class PeopleSetController < ApplicationController
+    after_filter :append_event_tracking_tags
+
+    def index
+      mixpanel_people_set "$email" => "jsmith@example.com"
+      render inline: "OK", layout: true
+    end
+  end
+
+  context "track event with properties" do
+    background { visit "/people_set" }
+    it { should include %Q{mixpanel.people.set({"$email":"jsmith@example.com"})} }
+  end
 end

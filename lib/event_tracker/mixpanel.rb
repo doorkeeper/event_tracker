@@ -35,4 +35,8 @@ class EventTracker::Mixpanel
   def identify(distinct_id)
     %Q{mixpanel.identify("#{distinct_id}");}
   end
+
+  def people_set(properties)
+    %Q{mixpanel.people.set(#{properties.to_json});}
+  end
 end
