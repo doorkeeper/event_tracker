@@ -166,4 +166,18 @@ feature 'basic integration' do
     background { visit "/people_set" }
     it { should include %Q{mixpanel.people.set({"$email":"jsmith@example.com"})} }
   end
+
+  class AliasController < ApplicationController
+    after_filter :append_event_tracking_tags
+
+    def index
+      mixpanel_alias "jsmith@example.com"
+      render inline: "OK", layout: true
+    end
+  end
+
+  context "track event with properties" do
+    background { visit "/alias" }
+    it { should include %Q{mixpanel.alias("jsmith@example.com")} }
+  end
 end

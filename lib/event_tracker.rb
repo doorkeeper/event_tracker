@@ -15,6 +15,10 @@ module EventTracker
     def mixpanel_people_set(args)
       (session[:mixpanel_people_set] ||= {}).merge!(args)
     end
+
+    def mixpanel_alias(identity)
+      session[:mixpanel_alias] = identity
+    end
   end
 
   module ActionControllerExtension
@@ -51,7 +55,9 @@ module EventTracker
       body_insert_at = body.index('</body')
       return unless body_insert_at
       a = []
-      if distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
+      if mixpanel_alias = session.delete(:mixpanel_alias)
+        a << mixpanel_tracker.alias(mixpanel_alias)
+      elsif distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
         a << mixpanel_tracker.identify(distinct_id)
       end
       if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag

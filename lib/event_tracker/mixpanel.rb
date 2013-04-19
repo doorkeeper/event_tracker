@@ -39,4 +39,8 @@ class EventTracker::Mixpanel
   def people_set(properties)
     %Q{mixpanel.people.set(#{properties.to_json});}
   end
+
+  def alias(identity)
+    %Q{mixpanel.alias(#{identity.to_json});}
+  end
 end
