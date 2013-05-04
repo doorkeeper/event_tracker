@@ -46,6 +46,7 @@ module EventTracker
     end
 
     def append_event_tracking_tags
+      yield
       return if event_trackers.empty?
 
       body = response.body
