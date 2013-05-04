@@ -29,7 +29,7 @@ feature 'basic integration' do
   subject { page.find("body script").native.content }
 
   class BasicController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
     def no_tracking
       render inline: "OK", layout: true
     end
@@ -68,7 +68,7 @@ feature 'basic integration' do
   end
 
   class RedirectsController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
 
     def index
       track_event "Register for site"
@@ -86,7 +86,7 @@ feature 'basic integration' do
   end
 
   class WithPropertiesController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
 
     def index
       register_properties age: 19
@@ -105,7 +105,7 @@ feature 'basic integration' do
   end
 
   class IdentityController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
     def mixpanel_distinct_id
       "distinct_id"
     end
@@ -125,7 +125,7 @@ feature 'basic integration' do
   end
 
   class NameTagController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
     def mixpanel_name_tag
       "foo@example.org"
     end
@@ -141,7 +141,7 @@ feature 'basic integration' do
   end
 
   class PrivateController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
     def index; render inline: "OK", layout: true; end
     private
     def mixpanel_distinct_id; "distinct_id"; end
@@ -154,7 +154,7 @@ feature 'basic integration' do
   end
 
   class PeopleSetController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
 
     def index
       mixpanel_people_set "$email" => "jsmith@example.com"
@@ -168,7 +168,7 @@ feature 'basic integration' do
   end
 
   class AliasController < ApplicationController
-    after_filter :append_event_tracking_tags
+    around_filter :append_event_tracking_tags
 
     def index
       mixpanel_alias "jsmith@example.com"
@@ -180,4 +180,24 @@ feature 'basic integration' do
     background { visit "/alias" }
     it { should include %Q{mixpanel.alias("jsmith@example.com")} }
   end
+
+  context "halting filter chain in a before_filter" do
+    background { visit "/before_filter" }
+    it_should_behave_like "init"
+  end
+
+  class BeforeFilterController < ApplicationController
+    around_filter :append_event_tracking_tags
+    before_filter :halt_the_chain_and_render
+
+    def index
+      render inline: "OK", layout: true
+    end
+
+    def halt_the_chain_and_render
+      render inline: "OK", layout: true and return
+    end
+
+  end
+
 end

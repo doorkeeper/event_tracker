@@ -26,7 +26,7 @@ config.event_tracker.mixpanel_key = "YOUR_KEY"
 config.event_tracker.kissmetrics_key = "YOUR_KEY"
 
 class ApplicationController < ActionController::Base
-  after_filter :append_event_tracking_tags
+  around_filter :append_event_tracking_tags
 
   # optionally identify users
   def mixpanel_distinct_id
