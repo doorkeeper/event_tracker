@@ -12,8 +12,20 @@ module EventTracker
       (session[:registered_properties] ||= {}).merge!(args)
     end
 
+    def mixpanel_set_config(args)
+      (session[:mixpanel_set_config] ||= {}).merge!(args)
+    end
+
     def mixpanel_people_set(args)
       (session[:mixpanel_people_set] ||= {}).merge!(args)
+    end
+
+    def mixpanel_people_set_once(args)
+      (session[:mixpanel_people_set_once] ||= {}).merge!(args)
+    end
+
+    def mixpanel_people_increment(event_name)
+      (session[:mixpanel_people_increment] ||= []) << event_name
     end
 
     def mixpanel_alias(identity)
@@ -52,24 +64,42 @@ module EventTracker
       body = response.body
       head_insert_at = body.index('</head')
       return unless head_insert_at
+
       body.insert head_insert_at, view_context.javascript_tag(event_trackers.map {|t| t.init }.join("\n"))
       body_insert_at = body.index('</body')
       return unless body_insert_at
+
       a = []
       if mixpanel_alias = session.delete(:mixpanel_alias)
         a << mixpanel_tracker.alias(mixpanel_alias)
       elsif distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
         a << mixpanel_tracker.identify(distinct_id)
       end
+
       if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag
         a << mixpanel_tracker.name_tag(name_tag)
       end
+
+      if (config = session.delete(:mixpanel_set_config)).present?
+        a << mixpanel_tracker.set_config(config)
+      end
+
       if (people = session.delete(:mixpanel_people_set)).present?
         a << mixpanel_tracker.people_set(people)
       end
+
+      if (people = session.delete(:mixpanel_people_set_once)).present?
+        a << mixpanel_tracker.people_set_once(people)
+      end
+
+      if (people = session.delete(:mixpanel_people_increment)).present?
+        a << mixpanel_tracker.people_increment(people)
+      end
+
       if identity = respond_to?(:kissmetrics_identity, true) && kissmetrics_identity
         a << kissmetrics_tracker.identify(identity)
       end
+
       registered_properties = session.delete(:registered_properties)
       event_tracker_queue = session.delete(:event_tracker_queue)
 
@@ -82,6 +112,7 @@ module EventTracker
           end
         end
       end
+
       body.insert body_insert_at, view_context.javascript_tag(a.join("\n"))
       response.body = body
     end

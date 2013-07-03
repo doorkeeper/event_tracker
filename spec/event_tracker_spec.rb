@@ -153,6 +153,20 @@ feature 'basic integration' do
     it_should_behave_like "with distinct id"
   end
 
+  class SetConfigController < ApplicationController
+    around_filter :append_event_tracking_tags
+
+    def index
+      mixpanel_set_config 'track_pageview' => false
+      render inline: "OK", layout: true
+    end
+  end
+
+  context 'configure mixpanel' do
+    background { visit '/set_config' }
+    it { should include %Q{mixpanel.set_config({"track_pageview":false})} }
+  end
+
   class PeopleSetController < ApplicationController
     around_filter :append_event_tracking_tags
 
@@ -162,9 +176,37 @@ feature 'basic integration' do
     end
   end
 
-  context "track event with properties" do
+  context "people set properties" do
     background { visit "/people_set" }
     it { should include %Q{mixpanel.people.set({"$email":"jsmith@example.com"})} }
+  end
+
+  class PeopleSetOnceController < ApplicationController
+    around_filter :append_event_tracking_tags
+
+    def index
+      mixpanel_people_set_once "One more time" => "With feeling"
+      render inline: "OK", layout: true
+    end
+  end
+
+  context 'people set properties once' do
+    background { visit '/people_set_once' }
+    it { should include %Q{mixpanel.people.set_once({"One more time":"With feeling"})} }
+  end
+
+  class PeopleIncrementController < ApplicationController
+    around_filter :append_event_tracking_tags
+
+    def index
+      mixpanel_people_increment "Named Attribute"
+      render inline: "OK", layout: true
+    end
+  end
+
+  context 'people set properties once' do
+    background { visit '/people_increment' }
+    it { should include %Q{mixpanel.people.increment(["Named Attribute"])} }
   end
 
   class AliasController < ApplicationController
