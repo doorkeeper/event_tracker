@@ -45,6 +45,7 @@ end
 # in controller or views
 track_event("Event Name", optional_property: "value")
 register_properties(name: "value")
+mixpanel_people_set( "property" => "value", "property" => "value")
 ```
 
 ## Todos
