@@ -24,6 +24,7 @@ Or install it yourself as:
 # config/application.rb
 config.event_tracker.mixpanel_key = "YOUR_KEY"
 config.event_tracker.kissmetrics_key = "YOUR_KEY"
+config.event_tracker.google_analytics_key = "YOUR_KEY"
 
 class ApplicationController < ActionController::Base
   around_filter :append_event_tracking_tags

@@ -1,6 +1,7 @@
 require "event_tracker/version"
 require "event_tracker/mixpanel"
 require "event_tracker/kissmetrics"
+require "event_tracker/google_analytics"
 
 module EventTracker
   module HelperMethods
@@ -48,11 +49,19 @@ module EventTracker
       end
     end
 
+    def google_analytics_tracker
+      @google_analytics_tracker ||= begin
+        google_analytics_key = Rails.application.config.event_tracker.google_analytics_key
+        EventTracker::GoogleAnalytics.new(google_analytics_key) if google_analytics_key
+      end
+    end
+
     def event_trackers
       @event_trackers ||= begin
         trackers = []
         trackers << mixpanel_tracker if mixpanel_tracker
         trackers << kissmetrics_tracker if kissmetrics_tracker
+        trackers << google_analytics_tracker if google_analytics_tracker
         trackers
       end
     end
@@ -104,7 +113,7 @@ module EventTracker
       event_tracker_queue = session.delete(:event_tracker_queue)
 
       event_trackers.each do |tracker|
-        a << tracker.register(registered_properties) if registered_properties.present?
+        a << tracker.register(registered_properties) if registered_properties.present? && tracker.respond_to?(:register)
 
         if event_tracker_queue.present?
           event_tracker_queue.each do |event_name, properties|

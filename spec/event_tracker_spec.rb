@@ -4,6 +4,7 @@ shared_examples_for "init" do
   subject { page.find("head script").native.content }
   it { should include('mixpanel.init("YOUR_TOKEN")') }
   it { should include(%q{var _kmk = _kmk || 'KISSMETRICS_KEY'}) }
+  it { should include(%q{ga('create', 'GOOGLE_ANALYTICS_KEY', 'auto', {'name': 'event_tracker'});}) }
 end
 
 shared_examples_for "without distinct id" do
@@ -18,11 +19,13 @@ end
 
 shared_examples_for "without event" do
   it { should_not include('mixpanel.track("Register for site")') }
+  it { should_not include(%q{ga('event_tracker.send', 'event', 'event_tracker', 'Register for site');}) }
 end
 
 shared_examples_for "with event" do
   it { should include('mixpanel.track("Register for site")') }
   it { should include(%q{_kmq.push(['record', 'Register for site']);}) }
+  it { should include(%q{ga('event_tracker.send', 'event', 'event_tracker', 'Register for site');}) }
 end
 
 feature 'basic integration' do
