@@ -1,6 +1,6 @@
 # Event Tracker
 
-Easy tracking using mixpanel or kissmetrics.
+Easy tracking using mixpanel, kissmetrics, or Google Analytics (universal analytics).
 
 For details, see our guide to [tracking events](http://www.doorkeeperhq.com/developer/event-tracker-mixpanel-kissmetrics).
 

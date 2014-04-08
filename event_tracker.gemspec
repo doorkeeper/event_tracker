@@ -4,7 +4,7 @@ require File.expand_path('../lib/event_tracker/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Paul McMahon"]
   gem.email         = ["paul@mobalean.com"]
-  gem.description   = %q{Easy integration with Mixpanel and Kissmetrics for Rails}
+  gem.description   = %q{Easy integration with Mixpanel, Kissmetrics, and Google Analytics for Rails}
   gem.summary       = %q{Track using javascript from your controllers, even when redirecting}
   gem.homepage      = "http://www.doorkeeperhq.com/developer/event-tracker-mixpanel-kissmetrics"
 
