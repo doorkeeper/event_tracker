@@ -32,6 +32,38 @@ module EventTracker
     def mixpanel_alias(identity)
       session[:mixpanel_alias] = identity
     end
+    
+    # To register events and people metrics against another identity in Mixpanel you can
+    # set the identity to that other user. We do this at the end of the JS code, so no
+    # need to switch back to actual user.
+    
+    def mixpanel_alternate_identify(identity)
+      session[:mixpanel_alternate_identify] = identity
+    end
+    
+    def alternate_track_event(event_name, args = {})
+      (session[:alternate_event_tracker_queue] ||= []) << [event_name, args]
+    end
+
+    def alternate_register_properties(args)
+      (session[:alternate_registered_properties] ||= {}).merge!(args)
+    end
+
+    def mixpanel_alternate_people_set(args)
+      (session[:mixpanel_alternate_people_set] ||= {}).merge!(args)
+    end
+    
+    def mixpanel_alternate_people_set_once(args)
+      (session[:mixpanel_alternate_people_set_once] ||= {}).merge!(args)
+    end
+    
+    def mixpanel_alternate_people_increment(event_name)
+      (session[:mixpanel_alternate_people_increment] ||= []) << event_name
+    end
+    
+    def mixpanel_alternate_track_event(event_name, args = {})
+      (session[:mixpanel_alternate_track_event] ||= []) << [event_name, args]
+    end
   end
 
   module ActionControllerExtension
@@ -111,6 +143,36 @@ module EventTracker
 
       registered_properties = session.delete(:registered_properties)
       event_tracker_queue = session.delete(:event_tracker_queue)
+
+      event_trackers.each do |tracker|
+        a << tracker.register(registered_properties) if registered_properties.present? && tracker.respond_to?(:register)
+
+        if event_tracker_queue.present?
+          event_tracker_queue.each do |event_name, properties|
+            a << tracker.track(event_name, properties)
+          end
+        end
+      end
+
+      # Alternate identity, events and people metrics
+      if mixpanel_identity = session.delete(:mixpanel_alternate_identify)
+        a << mixpanel_tracker.identify(mixpanel_identity)
+      end
+
+      if (people = session.delete(:mixpanel_alternate_people_set)).present?
+        a << mixpanel_tracker.people_set(people)
+      end
+
+      if (people = session.delete(:mixpanel_alternate_people_set_once)).present?
+        a << mixpanel_tracker.people_set_once(people)
+      end
+
+      if (people = session.delete(:mixpanel_alternate_people_increment)).present?
+        a << mixpanel_tracker.people_increment(people)
+      end
+
+      registered_properties = session.delete(:alternate_registered_properties)
+      event_tracker_queue = session.delete(:alternate_event_tracker_queue)
 
       event_trackers.each do |tracker|
         a << tracker.register(registered_properties) if registered_properties.present? && tracker.respond_to?(:register)
