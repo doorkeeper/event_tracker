@@ -18,4 +18,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'rails', '>= 3.0'
   gem.add_development_dependency 'steak'
   gem.add_development_dependency 'capybara', '~> 2.0.3'
+  gem.add_development_dependency 'rspec-rails', '~> 2.14.0'
 end
