@@ -242,7 +242,42 @@ feature 'basic integration' do
     def halt_the_chain_and_render
       render inline: "OK", layout: true and return
     end
+  end
+    
+  # Mixpanel Alternate Identity Tracking
+  class AlternateIdentityController < ApplicationController
+    around_filter :append_event_tracking_tags
+    def identity_switch
+      mixpanel_alternate_identify "Another User"
+      render inline: "OK", layout: true
+    end
 
+    def people_set
+      mixpanel_alternate_identify "Another User"
+      mixpanel_alternate_people_set "Foo" => "Bar"
+      render inline: "OK", layout: true
+    end
+
+    def people_increment
+      mixpanel_alternate_identify "Another User"
+      mixpanel_alternate_people_increment "Named Attribute"
+      render inline: "OK", layout: true
+    end
+  end
+
+  context 'alternate identity tracking' do
+    background { visit '/alternate_identity/identity_switch' }
+    it { should include %Q{mixpanel.identify("Another User")} }
+  end
+
+  context 'alternate identity tracking with people set' do
+    background { visit '/alternate_identity/people_set' }
+    it { should include %Q{mixpanel.people.set({"Foo":"Bar"})} }
+  end
+
+  context 'alternate identity tracking with people increment' do
+    background { visit '/alternate_identity/people_increment' }
+    it { should include %Q{mixpanel.people.increment(["Named Attribute"])} }
   end
 
 end
