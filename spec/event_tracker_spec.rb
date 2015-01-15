@@ -254,7 +254,7 @@ feature 'basic integration' do
 
     def people_set
       mixpanel_alternate_identify "Another User"
-      mixpanel_people_set "Foo" => "Bar"
+      mixpanel_alternate_people_set "Foo" => "Bar"
       render inline: "OK", layout: true
     end
 
