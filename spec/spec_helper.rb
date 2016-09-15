@@ -26,5 +26,4 @@ end
 class ApplicationController < ActionController::Base; end
 
 require 'rspec/rails'
-require "steak"
 

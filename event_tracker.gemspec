@@ -16,6 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = EventTracker::VERSION
 
   gem.add_dependency 'rails', '>= 3.0'
-  gem.add_development_dependency 'steak'
-  gem.add_development_dependency 'capybara', '~> 2.0.3'
+  gem.add_development_dependency 'capybara', '>= 2.1'
+  gem.add_development_dependency 'rspec-rails'
 end
