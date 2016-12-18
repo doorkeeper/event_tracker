@@ -16,11 +16,11 @@ class EventTracker::Integration::Mixpanel < EventTracker::Integration::Base
   end
 
   def register(registered_properties)
-    %Q{mixpanel.register(#{registered_properties.to_json});}
+    %Q{mixpanel.register(#{embeddable_json(registered_properties)});}
   end
 
   def track(event_name, properties)
-    p = properties.empty? ? "" : ", #{properties.to_json}"
+    p = properties.empty? ? "" : ", #{embeddable_json(properties)}"
     %Q{mixpanel.track("#{event_name}"#{p});}
   end
 
@@ -33,22 +33,22 @@ class EventTracker::Integration::Mixpanel < EventTracker::Integration::Base
   end
 
   def people_set(properties)
-    %Q{mixpanel.people.set(#{properties.to_json});}
+    %Q{mixpanel.people.set(#{embeddable_json(properties)});}
   end
 
   def people_set_once(properties)
-    %Q{mixpanel.people.set_once(#{properties.to_json});}
+    %Q{mixpanel.people.set_once(#{embeddable_json(properties)});}
   end
 
   def people_increment(properties)
-    %Q{mixpanel.people.increment(#{properties.to_json});}
+    %Q{mixpanel.people.increment(#{embeddable_json(properties)});}
   end
 
   def set_config(properties)
-    %Q{mixpanel.set_config(#{properties.to_json});}
+    %Q{mixpanel.set_config(#{embeddable_json(properties)});}
   end
 
   def alias(identity)
-    %Q{mixpanel.alias(#{identity.to_json});}
+    %Q{mixpanel.alias(#{embeddable_json(identity)});}
   end
 end

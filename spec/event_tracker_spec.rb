@@ -94,16 +94,16 @@ feature 'basic integration' do
     def index
       register_properties age: 19
       register_properties gender: "female"
-      track_event "Take an action", property1: "a", property2: 1
+      track_event "Take an action", property1: "a", property2: 1, xss: "</script>"
       render inline: "OK", layout: true
     end
   end
 
   context "track event with properties" do
     background { visit "/with_properties" }
-    it { should include %Q{mixpanel.track("Take an action", {"property1":"a","property2":1})} }
+    it { should include %q{mixpanel.track("Take an action", {"property1":"a","property2":1,"xss":"\u003c/script\u003e"})} }
     it { should include %Q{mixpanel.register({"age":19,"gender":"female"})} }
-    it { should include %Q{_kmq.push(['record', 'Take an action', {"property1":"a","property2":1}])} }
+    it { should include %q{_kmq.push(['record', 'Take an action', {"property1":"a","property2":1,"xss":"\u003c/script\u003e"}])} }
     it { should include %Q{_kmq.push(['set', {"age":19,"gender":"female"}])} }
   end
 
