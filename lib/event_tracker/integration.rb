@@ -1,0 +1,2 @@
+module EventTracker::Integration
+end

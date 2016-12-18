@@ -1,7 +1,9 @@
 require "event_tracker/version"
-require "event_tracker/mixpanel"
-require "event_tracker/kissmetrics"
-require "event_tracker/google_analytics"
+require "event_tracker/integration"
+require "event_tracker/integration/base"
+require "event_tracker/integration/mixpanel"
+require "event_tracker/integration/kissmetrics"
+require "event_tracker/integration/google_analytics"
 
 module EventTracker
   module HelperMethods
@@ -38,21 +40,21 @@ module EventTracker
     def mixpanel_tracker
       @mixpanel_tracker ||= begin
         mixpanel_key = Rails.application.config.event_tracker.mixpanel_key
-        EventTracker::Mixpanel.new(mixpanel_key) if mixpanel_key
+        EventTracker::Integration::Mixpanel.new(mixpanel_key) if mixpanel_key
       end
     end
 
     def kissmetrics_tracker
       @kissmetrics_tracker ||= begin
         kissmetrics_key = Rails.application.config.event_tracker.kissmetrics_key
-        EventTracker::Kissmetrics.new(kissmetrics_key) if kissmetrics_key
+        EventTracker::Integration::Kissmetrics.new(kissmetrics_key) if kissmetrics_key
       end
     end
 
     def google_analytics_tracker
       @google_analytics_tracker ||= begin
         google_analytics_key = Rails.application.config.event_tracker.google_analytics_key
-        EventTracker::GoogleAnalytics.new(google_analytics_key) if google_analytics_key
+        EventTracker::Integration::GoogleAnalytics.new(google_analytics_key) if google_analytics_key
       end
     end
 

@@ -1,8 +1,4 @@
-class EventTracker::Kissmetrics
-  def initialize(key)
-    @key = key
-  end
-
+class EventTracker::Integration::Kissmetrics < EventTracker::Integration::Base
   def init
     <<-EOD
       var _kmq = _kmq || [];

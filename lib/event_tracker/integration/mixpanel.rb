@@ -1,8 +1,4 @@
-class EventTracker::Mixpanel
-  def initialize(key)
-    @key = key
-  end
-
+class EventTracker::Integration::Mixpanel < EventTracker::Integration::Base
   def init
     s = <<-EOD
       (function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");

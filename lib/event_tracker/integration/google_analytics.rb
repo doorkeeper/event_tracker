@@ -1,8 +1,4 @@
-class EventTracker::GoogleAnalytics
-  def initialize(key)
-    @key = key
-  end
-
+class EventTracker::Integration::GoogleAnalytics < EventTracker::Integration::Base
   def init
     <<-EOD
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
