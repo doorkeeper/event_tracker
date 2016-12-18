@@ -37,38 +37,8 @@ module EventTracker
   end
 
   module ActionControllerExtension
-    def mixpanel_tracker
-      @mixpanel_tracker ||= begin
-        mixpanel_key = Rails.application.config.event_tracker.mixpanel_key
-        EventTracker::Integration::Mixpanel.new(mixpanel_key) if mixpanel_key
-      end
-    end
-
-    def kissmetrics_tracker
-      @kissmetrics_tracker ||= begin
-        kissmetrics_key = Rails.application.config.event_tracker.kissmetrics_key
-        EventTracker::Integration::Kissmetrics.new(kissmetrics_key) if kissmetrics_key
-      end
-    end
-
-    def google_analytics_tracker
-      @google_analytics_tracker ||= begin
-        google_analytics_key = Rails.application.config.event_tracker.google_analytics_key
-        EventTracker::Integration::GoogleAnalytics.new(google_analytics_key) if google_analytics_key
-      end
-    end
-
-    def event_trackers
-      @event_trackers ||= begin
-        trackers = []
-        trackers << mixpanel_tracker if mixpanel_tracker
-        trackers << kissmetrics_tracker if kissmetrics_tracker
-        trackers << google_analytics_tracker if google_analytics_tracker
-        trackers
-      end
-    end
-
     def append_event_tracking_tags
+      event_trackers = EventTracker::Integration.configured
       yield
       return if event_trackers.empty?
 
@@ -81,40 +51,42 @@ module EventTracker
       return unless body_insert_at
 
       a = []
-      if mixpanel_alias = session.delete(:mixpanel_alias)
-        a << mixpanel_tracker.alias(mixpanel_alias)
-      elsif distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
-        a << mixpanel_tracker.identify(distinct_id)
-      end
-
-      if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag
-        a << mixpanel_tracker.name_tag(name_tag)
-      end
-
-      if (config = session.delete(:mixpanel_set_config)).present?
-        a << mixpanel_tracker.set_config(config)
-      end
-
-      if (people = session.delete(:mixpanel_people_set)).present?
-        a << mixpanel_tracker.people_set(people)
-      end
-
-      if (people = session.delete(:mixpanel_people_set_once)).present?
-        a << mixpanel_tracker.people_set_once(people)
-      end
-
-      if (people = session.delete(:mixpanel_people_increment)).present?
-        a << mixpanel_tracker.people_increment(people)
-      end
-
-      if identity = respond_to?(:kissmetrics_identity, true) && kissmetrics_identity
-        a << kissmetrics_tracker.identify(identity)
-      end
-
       registered_properties = session.delete(:registered_properties)
       event_tracker_queue = session.delete(:event_tracker_queue)
 
       event_trackers.each do |tracker|
+        if tracker.is_a?(EventTracker::Integration::Mixpanel)
+          if mixpanel_alias = session.delete(:mixpanel_alias)
+            a << tracker.alias(mixpanel_alias)
+          elsif distinct_id = respond_to?(:mixpanel_distinct_id, true) && mixpanel_distinct_id
+            a << tracker.identify(distinct_id)
+          end
+
+          if name_tag = respond_to?(:mixpanel_name_tag, true) && mixpanel_name_tag
+            a << tracker.name_tag(name_tag)
+          end
+
+          if (config = session.delete(:mixpanel_set_config)).present?
+            a << tracker.set_config(config)
+          end
+
+          if (people = session.delete(:mixpanel_people_set)).present?
+            a << tracker.people_set(people)
+          end
+
+          if (people = session.delete(:mixpanel_people_set_once)).present?
+            a << tracker.people_set_once(people)
+          end
+
+          if (people = session.delete(:mixpanel_people_increment)).present?
+            a << tracker.people_increment(people)
+          end
+        elsif tracker.is_a?(EventTracker::Integration::Kissmetrics)
+          if identity = respond_to?(:kissmetrics_identity, true) && kissmetrics_identity
+            a << tracker.identify(identity)
+          end
+        end
+
         a << tracker.register(registered_properties) if registered_properties.present? && tracker.respond_to?(:register)
 
         if event_tracker_queue.present?
