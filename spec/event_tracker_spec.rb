@@ -246,4 +246,15 @@ feature 'basic integration' do
     it { expect(page.body).to_not include("ORIGINAL") }
     it { expect(page.body).to include("HALTED") }
   end
+
+  if Rails.version >= "5"
+    class ApiController < ActionController::API
+      def index
+        head :ok
+      end
+    end
+
+    background { visit "/api" }
+    it { expect(page).to have_http_status(:ok) }
+  end
 end
