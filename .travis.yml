@@ -1,0 +1,10 @@
+language: ruby
+cache: bundler
+sudo: false
+before_install: gem install bundler
+script: bundle exec rake
+gemfile:
+  - Gemfile
+  - gemfiles/Gemfile.rails-4.2.rb
+rvm:
+  - 2.3.1
