@@ -47,7 +47,7 @@ module EventTracker
       return unless head_insert_at
 
       body.insert head_insert_at, view_context.javascript_tag(event_trackers.map {|t| t.init }.join("\n"))
-      body_insert_at = body.index('</body')
+      body_insert_at = body.index('</eventtracker_body>') || body.index('</body')
       return unless body_insert_at
 
       a = []

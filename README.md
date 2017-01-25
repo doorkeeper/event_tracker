@@ -51,6 +51,18 @@ register_properties(name: "value")
 mixpanel_people_set( "property" => "value", "property" => "value")
 ```
 
+### jQueryMobile integration
+
+By default tracking scripts are added just before `</body>` tag. When you use **jQueryMobile** plugin in your app, only scipts which are defined inside of DOM element marked with `data-role='page'` are executed. This means that you need to refresh page to see tracked events.
+
+To solve it, add `<eventtracker_body>` tag inside your `div data-role='page'` element.
+
+```html
+<div data-role='page'>
+  <eventtracker_body></eventtracker_body>
+</div>
+```
+
 ## Todos
 
 * AJAX handling
