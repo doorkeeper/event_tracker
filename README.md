@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/doorkeeper/event_tracker.svg?branch=master)](https://travis-ci.org/doorkeeper/event_tracker)
+
 # Event Tracker
 
 Easy tracking using mixpanel, kissmetrics, or Google Analytics (universal analytics).
