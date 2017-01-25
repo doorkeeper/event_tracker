@@ -231,11 +231,11 @@ feature 'basic integration' do
     before_filter :halt_the_chain_and_render
 
     def index
-      render inline: "OK", layout: true
+      render inline: "ORIGINAL", layout: true
     end
 
     def halt_the_chain_and_render
-      render inline: "OK", layout: true and return
+      render inline: "HALTED", layout: true
     end
 
   end
@@ -243,5 +243,7 @@ feature 'basic integration' do
   context "halting filter chain in a before_filter" do
     background { visit "/before_filter" }
     it_should_behave_like "init"
+    it { expect(page.body).to_not include("ORIGINAL") }
+    it { expect(page.body).to include("HALTED") }
   end
 end
