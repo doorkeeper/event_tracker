@@ -226,11 +226,6 @@ feature 'basic integration' do
     it { should include %Q{mixpanel.alias("jsmith@example.com")} }
   end
 
-  context "halting filter chain in a before_filter" do
-    background { visit "/before_filter" }
-    it_should_behave_like "init"
-  end
-
   class BeforeFilterController < ApplicationController
     around_filter :append_event_tracking_tags
     before_filter :halt_the_chain_and_render
@@ -245,4 +240,8 @@ feature 'basic integration' do
 
   end
 
+  context "halting filter chain in a before_filter" do
+    background { visit "/before_filter" }
+    it_should_behave_like "init"
+  end
 end
