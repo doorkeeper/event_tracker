@@ -1,17 +1,21 @@
 class EventTracker::Integration::GoogleAnalytics < EventTracker::Integration::Base
   def init
-    <<-EOD
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    # The following is for initializing GA4. Uncomment it if you aren't already including GA4 on the site:
 
-      ga('create', '#{@key}', 'auto', {'name': 'event_tracker'});
-      ga('event_tracker.send', 'pageview');
-    EOD
+    # <<-EOD
+    #   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    #   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    #   j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    #   'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    #   })(window,document,'script','dataLayer', '#{@key}');
+
+    #   gtag('js', new Date());
+    #   gtag('config', '#{@key}');
+    # EOD
   end
 
   def track(event_name, properties = {})
-    %Q{ga('event_tracker.send', 'event', 'event_tracker', '#{event_name}');}
+    properties_js = properties.to_json
+    %Q{gtag('event', '#{event_name}', #{properties_js});}
   end
 end
